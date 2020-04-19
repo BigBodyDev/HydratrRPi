@@ -41,9 +41,10 @@ var interval;
 var soundHasPlayed = false;
 var sound;
 
-db.ref("/Manager_Data/buzzer_active").on("value", function(snapshot){
-  var active = snapshot.val();
-  if (active == true){
+db.ref("/Manager_Data").on("value", function(snapshot){
+  var active = snapshot.val().buzzer_active;
+  var allowed = snapshot.val().reminders_active;
+  if (active == true && allowed == true){
     sound = player.play("beacon.mp3", function(err){
       if (err) throw err;
     });
@@ -72,26 +73,24 @@ db.ref("/").on("value", function(snapshot) {
 
   timeouts = [];
 
-  if (snapshot.val().Manager_Data.reminders_active){
-    for (key in snapshot.val().Reminders){
-      var value = snapshot.val().Reminders[key];
+  for (key in snapshot.val().Reminders){
+    var value = snapshot.val().Reminders[key];
 
-      var now = new Date();
-      var originalDate = new Date(Date.parse(value.time));
+    var now = new Date();
+    var originalDate = new Date(Date.parse(value.time));
 
-      var nowMilliseconds = now.getTime();
-      var originalDateMilliseconds = originalDate.getTime();
+    var nowMilliseconds = now.getTime();
+    var originalDateMilliseconds = originalDate.getTime();
 
-      while (originalDateMilliseconds <= nowMilliseconds){
-        originalDate.setDate(originalDate.getDate() + 1);
-        originalDateMilliseconds = originalDate.getTime();
-      }
-
-      var date = new Date(originalDate);
-
-      var milliseconds = date.getTime();
-      timeouts.push(getTimeout(milliseconds, value.id));
+    while (originalDateMilliseconds <= nowMilliseconds){
+      originalDate.setDate(originalDate.getDate() + 1);
+      originalDateMilliseconds = originalDate.getTime();
     }
+
+    var date = new Date(originalDate);
+
+    var milliseconds = date.getTime();
+    timeouts.push(getTimeout(milliseconds, value.id));
   }
 });
 
