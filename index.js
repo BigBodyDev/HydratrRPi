@@ -72,8 +72,7 @@ db.ref("/").on("value", function(snapshot) {
 
   timeouts = [];
 
-  // var ref = db.ref("Reminders");
-  // ref.once("value", function(snapshot) {
+  if (snapshot.val().Manager_Data.reminders_active){
     for (key in snapshot.val().Reminders){
       var value = snapshot.val().Reminders[key];
 
@@ -93,7 +92,7 @@ db.ref("/").on("value", function(snapshot) {
       var milliseconds = date.getTime();
       timeouts.push(getTimeout(milliseconds, value.id));
     }
-  // });
+  }
 });
 
 
